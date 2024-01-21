@@ -1,109 +1,78 @@
 #include "sort.h"
-
 /**
- * quick_sort - Sort a given array using the Quick
- * sort algorithm in the ascending order.
- *
- * @array: The array to be sorted.
- * @size: Thei size of @array.
- *
- **/
-void quick_sort(int *array, size_t size)
+*swap - the positions of two elements into an array
+*@array: array
+*@item1: array element
+*@item2: array element
+*/
+void swap(int *array, ssize_t item1, ssize_t item2)
 {
-	if (array == NULL || size < 2)
-	{
-		return;
-	}
+	int tmp;
 
-	sort_partition(array, size, 0, size - 1);
+	tmp = array[item1];
+	array[item1] = array[item2];
+	array[item2] = tmp;
 }
-
 /**
- * sort_partition - Sort the partitions in the array.
- *
- * @array: The array to be sorted.
- * @size: The size for the array.
- * @first: The index of the first element in the
- * sublist (partition in the array).
- * @last: The index of the last element in the
- * sublist (partition in the array).
- *
- **/
-void sort_partition(int *array, int size, int first, int last)
+ *lomuto_partition - lomuto partition sorting scheme implementation
+ *@array: array
+ *@first: first array element
+ *@last: last array element
+ *@size: size array
+ *Return: return the position of the last element sorted
+ */
+int lomuto_partition(int *array, ssize_t first, ssize_t last, size_t size)
 {
-	int pivot = 0;
+	int pivot = array[last];
+	ssize_t current = first, finder;
+
+	for (finder = first; finder < last; finder++)
+	{
+		if (array[finder] < pivot)
+		{
+			if (array[current] != array[finder])
+			{
+				swap(array, current, finder);
+				print_array(array, size);
+			}
+			current++;
+		}
+	}
+	if (array[current] != array[last])
+	{
+		swap(array, current, last);
+		print_array(array, size);
+	}
+	return (current);
+}
+/**
+ *qs - qucksort algorithm implementation
+ *@array: array
+ *@first: first array element
+ *@last: last array element
+ *@size: array size
+ */
+void qs(int *array, ssize_t first, ssize_t last, int size)
+{
+	ssize_t position = 0;
+
 
 	if (first < last)
 	{
-		pivot = get_pivot_index(array, size, first, last);
-		if (pivot - first > 1)
-		{
-			sort_partition(array, size, first, pivot - 1);
-		}
-		if (last - pivot > 1)
-		{
-			sort_partition(array, size, pivot + 1, last);
-		}
+		position = lomuto_partition(array, first, last, size);
+
+		qs(array, first, position - 1, size);
+		qs(array, position + 1, last, size);
 	}
 }
-
 /**
- * swap - Swaps the items at index @first_index with
- * the item at index at @second_index.
- *
- * @array: A pointer to the array of integers.
- * @first_index: The first element's index.
- * @second_index: The second element's index.
- *
- **/
-void swap(int **array, int first_index, int second_index)
+ *quick_sort - prepare the terrain to quicksort algorithm
+ *@array: array
+ *@size: array size
+ */
+void quick_sort(int *array, size_t size)
 {
-	int temp = 0;
-
-	temp = (*array)[first_index];
-	(*array)[first_index] = (*array)[second_index];
-	(*array)[second_index] = temp;
-}
-
-/**
- * get_pivot_index - Determine the index for the next
- * pivot in the sublist.
- *
- * @array: The array to be sorted.
- * @size: The size of the array.
- * @first: The index of the first element in the
- * sublist (partition in the array).
- * @last: The index of the last element in the
- * sublist (partition in the array).
- *
- * Return: The index for the new pivot.
- *
- **/
-int get_pivot_index(int *array, size_t size, int first, int last)
-{
-	int pivot = 0;
-	int left = 0, new_pivot = 0;
-
-	pivot = last;
-	left = first;
-	new_pivot = first - 1;
-
-	for (; left < last; left++)
-	{
-		if (array[left] <= array[pivot])
-		{
-			new_pivot++;
-			if (new_pivot != left)
-			{
-				swap(&array, new_pivot, left);
-				print_array(array, size);
-			}
-		}
-	}
-	if ((new_pivot + 1) != last)
-	{
-		swap(&array, new_pivot + 1, last);
-		print_array(array, size);
-	}
-	return (new_pivot + 1);
+	if (!array || size < 2)
+		return;
+	qs(array, 0, size - 1, size);
 }
